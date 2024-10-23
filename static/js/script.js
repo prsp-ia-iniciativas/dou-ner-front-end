@@ -138,15 +138,17 @@ function createCard(person, actionType) {
 }
 
 
-// Show card information in the fixed div (formatted as JSON-like design)
+// Show card information in the fixed div (formatted as real JSON)
 function showCardInfo(person) {
     const cardInfoContainer = document.getElementById('card-info-container');
     cardInfoContainer.innerHTML = `
         <div class="json-content">
-            <div class="json-pair"><span class="json-key">"Nome":</span> <span class="json-value">"${person.nome}"</span></div>
-            <div class="json-pair"><span class="json-key">"Categoria":</span> <span class="json-value">"${person.categoria}"</span></div>
-            <div class="json-pair"><span class="json-key">"Subcategoria":</span> <span class="json-value">"${person.subcategoria}"</span></div>
+            <div class="json-brace">JSON-Formatted <br /><br />{</div><br />
+            <div class="json-pair"><span class="json-key">"Nome":</span> <span class="json-value">"${person.nome}"</span>,</div>
+            <div class="json-pair"><span class="json-key">"Categoria":</span> <span class="json-value">"${person.categoria}"</span>,</div>
+            <div class="json-pair"><span class="json-key">"Subcategoria":</span> <span class="json-value">"${person.subcategoria}"</span>,</div>
             <div class="json-pair"><span class="json-key">"Data":</span> <span class="json-value">"${person.data || 'Sem data'}"</span></div>
+            <div class="json-brace">}</div>
         </div>
     `;
     cardInfoContainer.classList.add('show');

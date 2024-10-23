@@ -305,6 +305,14 @@ h2 {
     overflow-wrap: break-word;
     text-align: left;
     /* Align text left */
+    font-family: monospace;
+    /* Use monospace for JSON-style code */
+}
+
+/* Styling for curly braces */
+.json-brace {
+    color: #333;
+    font-weight: bold;
 }
 
 /* Key styling */
