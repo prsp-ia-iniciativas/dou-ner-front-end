@@ -341,12 +341,20 @@ h2 {
 .json-pair {
     margin-bottom: 8px;
 }
-
-/* Chatbot icon container */
-.chatbot-icon {
+/* Container to hold and align all icons */
+.icon-container {
     position: fixed;
     bottom: 20px;
     right: 20px;
+    display: flex;
+    gap: 15px;
+    /* Space between icons */
+    z-index: 1001;
+    /* Above other elements */
+}
+
+/* General icon styling for all three icons */
+.icon {
     background-color: #007aff;
     /* Apple-style blue */
     color: white;
@@ -355,29 +363,66 @@ h2 {
     font-size: 24px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     cursor: pointer;
-    z-index: 1001;
-    /* Above other elements */
+    position: relative;
+    /* Allows text to be positioned absolutely */
     transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
-.chatbot-icon:hover {
-    background-color: #005fcb;
+/* Hover effects with different colors for each icon */
+/* Info icon hover effect */
+.info-icon:hover {
+    background-color: #218838;
+    /* Darker green on hover */
     transform: scale(1.05);
-    /* Slightly larger on hover */
 }
 
-.chatbot-text {
+/* Mail icon hover effect */
+.mail-icon:hover {
+    background-color: #c82333;
+    /* Darker red on hover */
+    transform: scale(1.05);
+}
+
+/* Chatbot icon hover effect */
+.chatbot-icon:hover {
+    background-color: #0056b3;
+    /* Darker blue on hover */
+    transform: scale(1.05);
+}
+
+/* Specific icon styles */
+/* Info Icon */
+.info-icon {
+    background-color: #28a745;
+    /* Green background for info icon */
+}
+
+/* Mail Icon */
+.mail-icon {
+    background-color: #dc3545;
+    /* Red background for mail icon */
+}
+
+/* Chatbot Icon */
+.chatbot-icon {
+    background-color: #007aff;
+    /* Blue background for chatbot */
+}
+
+/* Hidden text (span) to show on hover */
+.icon-text {
     visibility: hidden;
-    /* Initially hidden */
     opacity: 0;
     position: absolute;
     bottom: 100%;
-    /* Above the icon */
+    /* Places the text above the icon */
     right: 50%;
-    /* Centered */
+    /* Align text with icon center */
     transform: translateX(50%);
     background-color: #333;
+    /* Dark background for text bubble */
     color: #fff;
+    /* White text */
     padding: 8px 12px;
     border-radius: 6px;
     white-space: nowrap;
@@ -387,6 +432,13 @@ h2 {
     transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
+/* Show the text on hover */
+.icon:hover .icon-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Chatbot-specific text on hover */
 .chatbot-icon:hover .chatbot-text {
     visibility: visible;
     opacity: 1;
