@@ -7,7 +7,8 @@ body {
 }
 
 .container {
-    max-width: 600px;
+    max-width: 1200px;
+    /* Increased to accommodate wider content */
     margin: 0 auto;
     padding: 40px;
     background-color: white;
@@ -17,12 +18,97 @@ body {
 
 h1 {
     text-align: center;
-    color: #333;
-    font-weight: 500;
-    font-size: 24px;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
+    font-size: 28px;
 }
 
+/* Flex container for Exonerados and Nomeados sections */
+.flex-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+.list-section {
+    width: 48%;
+}
+
+h2 {
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #007aff;
+}
+
+/* Card container grid */
+.card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    /* Responsive grid */
+    grid-gap: 20px;
+}
+
+/* Individual card styles */
+.card {
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    /* Start cards hidden with opacity 0 and scale slightly smaller */
+    opacity: 0;
+    transform: scale(0.95);
+}
+
+/* Hover effect on card */
+.card:hover {
+    transform: translateY(-5px);
+    /* Subtle hover effect */
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.card .person-icon {
+    font-size: 30px;
+    margin-right: 10px;
+    color: #007aff;
+}
+
+.card-name {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+.card-category,
+.card-subcategory,
+.card-date {
+    font-size: 14px;
+    color: #555;
+}
+
+.card-category::before,
+.card-subcategory::before {
+    content: "#";
+    color: #007aff;
+    margin-right: 5px;
+}
+
+.card-date {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #888;
+}
+
+/* Button styles */
 .button {
     display: block;
     width: 100%;
@@ -44,86 +130,14 @@ h1 {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Hidden container for lists before content is loaded */
 .list-container {
     display: none;
-    /* Hide by default */
     justify-content: space-between;
     margin-top: 30px;
 }
 
-.list {
-    width: 45%;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-h3 {
-    font-size: 18px;
-    margin-bottom: 15px;
-    font-weight: 500;
-}
-
-ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-}
-
-li {
-    padding: 8px 0;
-    font-size: 16px;
-    color: #555;
-}
-
-input[type="file"] {
-    font-size: 16px;
-    padding: 10px;
-    margin-bottom: 15px;
-    width: 100%;
-}
-
-.uploaded-files {
-    margin-top: 15px;
-    font-size: 16px;
-    font-style: italic;
-}
-
-/* Typing animation */
-@keyframes typing {
-    from {
-        width: 0;
-    }
-
-    to {
-        width: 100%;
-    }
-}
-
-.typing {
-    display: inline-block;
-    white-space: nowrap;
-    overflow: hidden;
-    border-right: 3px solid;
-    width: 0;
-    animation: typing 3.5s steps(var(--chars), end) forwards;
-    /* Adjust steps dynamically */
-}
-
-.logo-container {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.logo {
-    max-width: 450px;
-    /* Adjust the size as needed */
-    height: auto;
-    margin: 0 auto;
-    /* Center the image */
-}
-
+/* Styling for uploading area */
 #drop-area {
     border: 2px dashed #007aff;
     border-radius: 10px;
@@ -147,4 +161,60 @@ input[type="file"] {
     color: #007aff;
     text-decoration: underline;
     cursor: pointer;
+}
+
+/* Styling for uploaded file names */
+.uploaded-files {
+    margin-top: 15px;
+    font-size: 16px;
+    font-style: italic;
+}
+
+/* Animation for names being typed out */
+@keyframes typing {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 100%;
+    }
+}
+
+.typing {
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    border-right: 3px solid;
+    width: 0;
+    animation: typing 3.5s steps(var(--chars), end) forwards;
+}
+
+.logo-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo {
+    max-width: 450px;
+    height: auto;
+    margin: 0 auto;
+}
+
+/* Apple-style fade-in animation for cards */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Apply fade-in animation to cards when they appear */
+.show-card {
+    animation: fadeInUp 0.6s ease forwards;
 }

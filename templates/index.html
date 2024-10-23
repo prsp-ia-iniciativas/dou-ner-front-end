@@ -30,20 +30,22 @@
         </div>
 
         <button id="analyze-button" class="button" disabled>Analisar</button>
-
-        <div class="list-container" id="list-container">
-            <div class="list">
-                <h3>Lista Exonerados ❌</h3>
-                <ul id="lista-exonerados">
-                    <!-- Dynamically filled with typing effect -->
-                </ul>
+        <!-- Flex container for the lists -->
+        <div class="flex-container">
+            <!-- Exonerados section -->
+            <div class="list-section">
+                <h2>Exonerados</h2>
+                <div class="card-container" id="exonerados-container">
+                    <!-- Cards will be inserted dynamically here -->
+                </div>
             </div>
-
-            <div class="list">
-                <h3>Lista Admitidos ✅</h3>
-                <ul id="lista-admitidos">
-                    <!-- Dynamically filled with typing effect -->
-                </ul>
+        
+            <!-- Nomeados section -->
+            <div class="list-section">
+                <h2>Nomeados</h2>
+                <div class="card-container" id="nomeados-container">
+                    <!-- Cards will be inserted dynamically here -->
+                </div>
             </div>
         </div>
     </div>

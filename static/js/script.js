@@ -2,7 +2,8 @@ const dropArea = document.getElementById('drop-area');
 const fileInput = document.getElementById('file-upload');
 const uploadedFiles = document.getElementById('uploaded-files');
 const analyzeButton = document.getElementById('analyze-button');
-const listContainer = document.getElementById('list-container');
+const exoneradosContainer = document.getElementById('exonerados-container');
+const nomeadosContainer = document.getElementById('nomeados-container');
 
 // Click to browse files
 dropArea.addEventListener('click', function () {
@@ -42,8 +43,7 @@ function handleFileUpload(files) {
     }
 }
 
-
-// Fetch the names from the server and simulate the typing effect
+// Fetch data from the JSON file and animate cards
 analyzeButton.addEventListener('click', function () {
     fetch('/analyze')
         .then(response => response.json())
@@ -53,40 +53,69 @@ analyzeButton.addEventListener('click', function () {
                 return;
             }
 
-            const exonerados = data.lista_exonerados || [];
-            const admitidos = data.lista_admitidos || [];
+            // Clear the previous cards
+            exoneradosContainer.innerHTML = '';
+            nomeadosContainer.innerHTML = '';
 
-            const listaExonerados = document.getElementById('lista-exonerados');
-            const listaAdmitidos = document.getElementById('lista-admitidos');
-
-            // Clear previous items
-            listaExonerados.innerHTML = '';
-            listaAdmitidos.innerHTML = '';
-
-            // Simulate typing effect for exonerados
-            exonerados.forEach((name, index) => {
-                const li = document.createElement('li');
-                li.classList.add('typing');
-                li.style.animationDelay = `${index * 0.5}s`;
-                li.style.setProperty('--chars', name.length);  // Set the char length dynamically
-                li.textContent = name;
-                listaExonerados.appendChild(li);
-            });
-
-            // Simulate typing effect for admitidos
-            admitidos.forEach((name, index) => {
-                const li = document.createElement('li');
-                li.classList.add('typing');
-                li.style.animationDelay = `${index * 0.5}s`;
-                li.style.setProperty('--chars', name.length);  // Set the char length dynamically
-                li.textContent = name;
-                listaAdmitidos.appendChild(li);
-            });
-
-            // Show lists after fetching
-            listContainer.style.display = 'flex';
+            // Populate and animate the cards
+            renderCards(data.lista_exonerados, exoneradosContainer, 'exoneração');
+            renderCards(data.lista_admitidos, nomeadosContainer, 'admissão');
         })
         .catch(error => {
             alert('Error fetching data: ' + error);
         });
 });
+
+// Function to render cards with animation
+function renderCards(peopleList, container, actionType) {
+    peopleList.forEach((person, index) => {
+        const card = createCard(person, actionType);
+        card.style.animationDelay = `${index * 0.2}s`; // Staggered animation
+        card.classList.add('show-card'); // Add animation class
+
+        // Append the card with a slight delay
+        setTimeout(() => {
+            container.appendChild(card);
+        }, index * 200);
+    });
+}
+
+// Helper function to create a card
+function createCard(person, actionType) {
+    const card = document.createElement('div');
+    card.classList.add('card');
+
+    // Card header
+    const header = document.createElement('div');
+    header.classList.add('card-header');
+    const icon = document.createElement('span');
+    icon.classList.add('person-icon');
+    icon.innerHTML = '👤'; // Use an emoji or custom icon
+    const name = document.createElement('div');
+    name.classList.add('card-name');
+    name.textContent = person.nome;
+
+    header.appendChild(icon);
+    header.appendChild(name);
+    card.appendChild(header);
+
+    // Category
+    const category = document.createElement('div');
+    category.classList.add('card-category');
+    category.textContent = person.categoria;
+    card.appendChild(category);
+
+    // Subcategory
+    const subcategory = document.createElement('div');
+    subcategory.classList.add('card-subcategory');
+    subcategory.textContent = person.subcategoria;
+    card.appendChild(subcategory);
+
+    // Date (optional)
+    const date = document.createElement('div');
+    date.classList.add('card-date');
+    date.textContent = person.data || 'Sem data'; // Default to "Sem data" if not provided
+    card.appendChild(date);
+
+    return card;
+}
