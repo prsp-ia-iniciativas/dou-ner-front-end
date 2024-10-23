@@ -49,25 +49,42 @@ h2 {
 }
 
 /* Individual card styles */
+/* Individual card styles */
 .card {
     background-color: #f9f9f9;
+    /* Default background before transition */
     border-radius: 10px;
     padding: 20px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    /* Reduced shadow for a softer look */
+    transition: transform 0.2s ease, box-shadow 0.3s ease, background-color 0.6s ease, filter 0.3s ease;
+    /* Smooth transitions */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-
-    /* Start cards hidden with opacity 0 and scale slightly smaller */
     opacity: 0;
     transform: scale(0.95);
+    /* Initial scale for animation */
 }
 
 /* Hover effect on card */
 .card:hover {
-    transform: translateY(-5px);
-    /* Subtle hover effect */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    /* Slightly increase shadow on hover */
+    filter: brightness(1.02);
+    /* Very subtle brightness on hover */
+}
+
+/* Very soft red background for exonerados */
+.exonerado {
+    background-color: #fce8e8;
+    /* Muted, soft pastel red */
+}
+
+/* Very soft green background for nomeados */
+.nomeado {
+    background-color: #e8f9e8;
+    /* Muted, soft pastel green */
 }
 
 .card-header {

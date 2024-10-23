@@ -73,6 +73,13 @@ function renderCards(peopleList, container, actionType) {
         card.style.animationDelay = `${index * 0.2}s`; // Staggered animation
         card.classList.add('show-card'); // Add animation class
 
+        // Apply the background color based on actionType (exoneração/nomeação)
+        if (actionType === 'exoneração') {
+            card.classList.add('exonerado'); // Apply red background for exonerados
+        } else if (actionType === 'admissão') {
+            card.classList.add('nomeado'); // Apply green background for nomeados
+        }
+
         // Append the card with a slight delay
         setTimeout(() => {
             container.appendChild(card);
