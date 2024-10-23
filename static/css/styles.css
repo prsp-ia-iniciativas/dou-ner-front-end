@@ -341,3 +341,57 @@ h2 {
 .json-pair {
     margin-bottom: 8px;
 }
+
+/* Chatbot icon container */
+.chatbot-icon {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #007aff;
+    /* Apple-style blue */
+    color: white;
+    border-radius: 50%;
+    padding: 10px 15px;
+    font-size: 24px;
+    /* Size for the chat icon */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    z-index: 1001;
+    /* Above other elements */
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+/* Hover effect on the chat icon */
+.chatbot-icon:hover {
+    background-color: #005fcb;
+    transform: scale(1.05);
+    /* Slightly larger on hover */
+}
+
+/* Text that appears on hover */
+.chatbot-text {
+    visibility: hidden;
+    /* Initially hidden */
+    opacity: 0;
+    position: absolute;
+    bottom: 100%;
+    /* Position it above the icon */
+    right: 50%;
+    /* Center it horizontally */
+    transform: translateX(50%);
+    background-color: #333;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    white-space: nowrap;
+    font-size: 14px;
+    font-weight: 400;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* Show the text on hover */
+.chatbot-icon:hover .chatbot-text {
+    visibility: visible;
+    opacity: 1;
+}
