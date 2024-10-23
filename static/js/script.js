@@ -66,7 +66,8 @@ analyzeButton.addEventListener('click', function () {
         });
 });
 
-// Function to render cards with animation and click functionality
+
+// Function to render the cards with hover and click interactions
 function renderCards(peopleList, container, actionType) {
     peopleList.forEach((person, index) => {
         const card = createCard(person, actionType);
@@ -80,7 +81,11 @@ function renderCards(peopleList, container, actionType) {
             card.classList.add('nomeado'); // Apply soft green background for nomeados
         }
 
-        // Add click event to navigate to the specified URL
+        // Add hover event to show card info
+        card.addEventListener('mouseenter', () => showCardInfo(person));
+        card.addEventListener('mouseleave', hideCardInfo);
+
+        // Add click event to open the link in a new tab
         card.addEventListener('click', function () {
             window.open("https://www.doe.sp.gov.br/executivo/universidade-de-sao-paulo/despachos-do-reitor-de-18-de-outubro-de-2024-20241021123911227666932", '_blank');
         });
@@ -92,7 +97,7 @@ function renderCards(peopleList, container, actionType) {
     });
 }
 
-// Helper function to create a card
+// Function to create a card with the necessary info
 function createCard(person, actionType) {
     const card = document.createElement('div');
     card.classList.add('card');
@@ -130,4 +135,25 @@ function createCard(person, actionType) {
     card.appendChild(date);
 
     return card;
+}
+
+
+// Show card information in the fixed div
+function showCardInfo(person) {
+    const cardInfoContainer = document.getElementById('card-info-container');
+    cardInfoContainer.innerHTML = `
+        <strong>Nome:</strong> ${person.nome}<br>
+        <strong>Categoria:</strong> ${person.categoria}<br>
+        <strong>Subcategoria:</strong> ${person.subcategoria}<br>
+        <strong>Data:</strong> ${person.data || 'Sem data'}<br>
+    `;
+    cardInfoContainer.classList.add('show');
+    cardInfoContainer.classList.remove('hide');
+}
+
+// Hide the fixed div
+function hideCardInfo() {
+    const cardInfoContainer = document.getElementById('card-info-container');
+    cardInfoContainer.classList.add('hide');
+    cardInfoContainer.classList.remove('show');
 }

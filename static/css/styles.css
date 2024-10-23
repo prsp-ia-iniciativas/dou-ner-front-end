@@ -254,3 +254,45 @@ h2 {
 .show-card {
     animation: fadeInUp 0.6s ease forwards;
 }
+
+/* Smaller fixed div for displaying card information */
+.hidden-info-container {
+    position: fixed;
+    top: 100px;
+    /* Positioned below the header */
+    right: 20px;
+    /* Slightly shifted to the left */
+    width: 250px;
+    /* Smaller width */
+    height: auto;
+    /* Let the height adjust based on the content */
+    background-color: #ffffff;
+    border-left: 2px solid #ddd;
+    /* Subtle border */
+    padding: 15px;
+    /* Slightly reduced padding */
+    font-size: 14px;
+    overflow-wrap: break-word;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+    /* Add shadow for a subtle effect */
+    z-index: 1000;
+    visibility: hidden;
+    /* Initially hidden, for smooth transition */
+    opacity: 0;
+    /* Hidden by default */
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    /* Smooth transition */
+}
+
+.hidden-info-container.show {
+    visibility: visible;
+    /* Ensure visibility is changed smoothly */
+    opacity: 1;
+    /* Fade in the box */
+}
+
+.hidden-info-container.hide {
+    visibility: hidden;
+    opacity: 0;
+    /* Fade out smoothly */
+}
