@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify
 from werkzeug.utils import secure_filename
 import os
 import json
+import requests  # Import requests to make HTTP requests
 
 app = Flask(__name__)
 
@@ -34,8 +35,33 @@ def upload_file():
 
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-        return redirect(url_for("index"))
+        file_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+        file.save(file_path)
+
+        # Perform the external file upload using requests
+        try:
+            with open(file_path, "rb") as f:
+                response = requests.post(
+                    "https://demo-prodesp-demo.apps.cluster-pqppz.pqppz.sandbox745.opentlc.com",
+                    files={"myFile": f},
+                    headers={"Content-Type": "multipart/form-data"},
+                )
+
+            # Check the response from the external server
+            if response.status_code == 200:
+                print("Upload successful")
+                return f"File uploaded successfully! Server Response: {response.text}"
+            else:
+                print("Not successful")
+                return (
+                    f"Failed to upload file. Server Response: {response.text}",
+                    response.status_code,
+                )
+
+        except Exception as e:
+            return f"An error occurred while uploading the file: {str(e)}", 500
+
+    return redirect(url_for("index"))
 
 
 # Route to load the lists from JSON and send to the frontend

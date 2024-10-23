@@ -60,8 +60,32 @@
         💬
         <span id="chatbot-text" class="chatbot-text">Posso ajudar?</span>
     </div>
+    
+    <!-- Chatbot Modal -->
+    <div id="chatbot-modal" class="chatbot-modal">
+        <div class="chatbot-modal-content">
+            <span id="chatbot-close" class="chatbot-close">&times;</span>
+            <div class="chatbot-header">
+                <h3>Chatbot</h3>
+            </div>
+            <div class="chatbot-messages" id="chatbot-messages">
+                <!-- Messages will appear here -->
+            </div>
+            <div class="chatbot-input-container">
+                <input type="text" id="chatbot-input" placeholder="Digite sua mensagem..." />
+                <button id="chatbot-send" class="chatbot-send">Enviar</button>
+            </div>
+            <!-- Powered by Falcon LLM -->
+            <div class="chatbot-footer">
+                <small>
+                    Powered by <a href="https://huggingface.co/tiiuae/falcon-7b" target="_blank">Falcon LLM</a>
+                </small>
+            </div>
+        </div>
+    </div>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    
 </body>
 
 </html>

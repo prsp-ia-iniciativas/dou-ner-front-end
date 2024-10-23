@@ -353,7 +353,6 @@ h2 {
     border-radius: 50%;
     padding: 10px 15px;
     font-size: 24px;
-    /* Size for the chat icon */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     cursor: pointer;
     z-index: 1001;
@@ -361,23 +360,21 @@ h2 {
     transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
-/* Hover effect on the chat icon */
 .chatbot-icon:hover {
     background-color: #005fcb;
     transform: scale(1.05);
     /* Slightly larger on hover */
 }
 
-/* Text that appears on hover */
 .chatbot-text {
     visibility: hidden;
     /* Initially hidden */
     opacity: 0;
     position: absolute;
     bottom: 100%;
-    /* Position it above the icon */
+    /* Above the icon */
     right: 50%;
-    /* Center it horizontally */
+    /* Centered */
     transform: translateX(50%);
     background-color: #333;
     color: #fff;
@@ -390,8 +387,135 @@ h2 {
     transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
-/* Show the text on hover */
 .chatbot-icon:hover .chatbot-text {
     visibility: visible;
     opacity: 1;
+}
+
+/* Chatbot Modal */
+.chatbot-modal {
+    display: none;
+    /* Hidden by default */
+    position: fixed;
+    bottom: 100px;
+    right: 40px;
+    width: 300px;
+    max-width: 90%;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1002;
+}
+
+.chatbot-modal-content {
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Chatbot Close Button */
+.chatbot-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 20px;
+    color: #333;
+    cursor: pointer;
+}
+
+.chatbot-header h3 {
+    margin: 0;
+    color: #007aff;
+    text-align: center;
+}
+
+/* Chatbot Messages */
+.chatbot-messages {
+    background-color: #fafafa;
+    border-radius: 12px;
+    padding: 15px;
+    height: 250px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    font-size: 15px;
+    color: #333;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Message Input and Send Button */
+.chatbot-input-container {
+    display: flex;
+    gap: 10px;
+}
+
+#chatbot-input {
+    flex: 1;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+}
+
+.chatbot-send {
+    background-color: #007aff;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.chatbot-send:hover {
+    background-color: #005fcb;
+}
+
+/* Scrollbar styling for chatbot messages */
+.chatbot-messages::-webkit-scrollbar {
+    width: 5px;
+}
+
+.chatbot-messages::-webkit-scrollbar-thumb {
+    background-color: #007aff;
+    border-radius: 10px;
+}
+
+/* Style for the footer with Falcon LLM credit */
+.chatbot-footer {
+    text-align: center;
+    margin-top: 10px;
+    padding: 10px 0;
+    font-size: 12px;
+    background-color: #f9f9f9;
+    border-top: 1px solid #ddd;
+}
+
+.chatbot-footer a {
+    color: #007BFF;
+    text-decoration: none;
+}
+
+.chatbot-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Mensagem do bot (alinhada à esquerda) */
+.bot-message {
+    color: #333;
+    text-align: left;
+}
+
+/* Mensagem do usuário (alinhada à direita) */
+.user-message {
+    color: #007aff;
+    text-align: right;
+    margin-left: auto;
+    /* Alinha as mensagens do usuário à direita */
+}
+
+/* Message Styles */
+.chatbot-message {
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 16px;
+    max-width: 80%;
+    line-height: 1.4;
 }

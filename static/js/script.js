@@ -162,3 +162,62 @@ function hideCardInfo() {
     cardInfoContainer.classList.add('hide');
     cardInfoContainer.classList.remove('show');
 }
+
+// Get elements
+const chatbotIcon = document.getElementById('chatbot-icon');
+const chatbotModal = document.getElementById('chatbot-modal');
+const chatbotClose = document.getElementById('chatbot-close');
+const chatbotSend = document.getElementById('chatbot-send');
+const chatbotInput = document.getElementById('chatbot-input');
+const chatbotMessages = document.getElementById('chatbot-messages');
+
+// Open the chatbot modal when the icon is clicked
+chatbotIcon.addEventListener('click', function () {
+    chatbotModal.style.display = 'block';
+
+    // Display initial bot message only if no messages are present
+    if (chatbotMessages.children.length === 0) {
+        const initialBotMessageDiv = document.createElement('div');
+        initialBotMessageDiv.classList.add('chatbot-message', 'bot-message');
+        initialBotMessageDiv.textContent = 'Olá! Como posso ajudar você hoje?';
+        chatbotMessages.appendChild(initialBotMessageDiv);
+
+        // Scroll to the bottom of the messages
+        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+    }
+});
+
+// Close the chatbot modal when the close button is clicked
+chatbotClose.addEventListener('click', function () {
+    chatbotModal.style.display = 'none';
+});
+
+// Send message when the "Enviar" button is clicked
+chatbotSend.addEventListener('click', function () {
+    const userMessage = chatbotInput.value.trim();
+
+    if (userMessage) {
+        // Display user message
+        const userMessageDiv = document.createElement('div');
+        userMessageDiv.classList.add('chatbot-message', 'user-message');
+        userMessageDiv.textContent = userMessage;
+        chatbotMessages.appendChild(userMessageDiv);
+
+        // Scroll to the bottom of the messages
+        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+
+        // Clear input field
+        chatbotInput.value = '';
+
+        // Simulate chatbot response
+        setTimeout(function () {
+            const botMessageDiv = document.createElement('div');
+            botMessageDiv.classList.add('chatbot-message', 'bot-message');
+            botMessageDiv.textContent = 'Posso ajudar com mais alguma coisa?';
+            chatbotMessages.appendChild(botMessageDiv);
+
+            // Scroll to the bottom of the messages
+            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+        }, 1000); // Simulate a delay for the bot response
+    }
+});
