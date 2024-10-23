@@ -221,3 +221,29 @@ chatbotSend.addEventListener('click', function () {
         }, 1000); // Simulate a delay for the bot response
     }
 });
+
+// Get the modal
+var modal = document.getElementById("email-modal");
+
+// Get the button that opens the modal (the mail icon)
+var mailIcon = document.getElementById("mail-icon");
+
+// Get the <span> element that closes the modal
+var closeModal = document.getElementById("close-modal");
+
+// When the user clicks the mail icon, open the modal
+mailIcon.onclick = function () {
+    modal.style.display = "block";
+}
+
+// When the user clicks on <span> (x), close the modal
+closeModal.onclick = function () {
+    modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function (event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}

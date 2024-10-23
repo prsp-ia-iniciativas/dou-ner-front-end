@@ -99,6 +99,19 @@
         </div>
     </div>
 
+    <!-- Email Subscription Modal -->
+    <div id="email-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="close-modal">&times;</span>
+            <h2>Subscribe to our Newsletter</h2>
+            <form id="email-form">
+                <label for="email">Enter your email:</label>
+                <input type="email" id="email" name="email" placeholder="you@example.com" required />
+                <button type="submit">Subscribe</button>
+            </form>
+        </div>
+    </div>
+
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     
 </body>
