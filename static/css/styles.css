@@ -16,10 +16,31 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+/* Main title (h1) */
 h1 {
     text-align: center;
     margin-bottom: 30px;
     font-size: 28px;
+    color: #1a1a1a;
+    /* Darker gray for an elegant, refined look */
+}
+
+/* Section title for Exonerados (h2) */
+h2.exonerados-title {
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #d9534f;
+    /* Soft red for Exonerados */
+}
+
+/* Section title for Nomeados (h2) */
+h2.nomeados-title {
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #5cb85c;
+    /* Soft green for Nomeados */
 }
 
 /* Flex container for Exonerados and Nomeados sections */
