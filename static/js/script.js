@@ -138,18 +138,21 @@ function createCard(person, actionType) {
 }
 
 
-// Show card information in the fixed div
+// Show card information in the fixed div (formatted as JSON-like design)
 function showCardInfo(person) {
     const cardInfoContainer = document.getElementById('card-info-container');
     cardInfoContainer.innerHTML = `
-        <strong>Nome:</strong> ${person.nome}<br>
-        <strong>Categoria:</strong> ${person.categoria}<br>
-        <strong>Subcategoria:</strong> ${person.subcategoria}<br>
-        <strong>Data:</strong> ${person.data || 'Sem data'}<br>
+        <div class="json-content">
+            <div class="json-pair"><span class="json-key">"Nome":</span> <span class="json-value">"${person.nome}"</span></div>
+            <div class="json-pair"><span class="json-key">"Categoria":</span> <span class="json-value">"${person.categoria}"</span></div>
+            <div class="json-pair"><span class="json-key">"Subcategoria":</span> <span class="json-value">"${person.subcategoria}"</span></div>
+            <div class="json-pair"><span class="json-key">"Data":</span> <span class="json-value">"${person.data || 'Sem data'}"</span></div>
+        </div>
     `;
     cardInfoContainer.classList.add('show');
     cardInfoContainer.classList.remove('hide');
 }
+
 
 // Hide the fixed div
 function hideCardInfo() {

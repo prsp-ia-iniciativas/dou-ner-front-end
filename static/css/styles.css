@@ -255,44 +255,81 @@ h2 {
     animation: fadeInUp 0.6s ease forwards;
 }
 
-/* Smaller fixed div for displaying card information */
+/* Small fixed div for displaying card information */
 .hidden-info-container {
     position: fixed;
     top: 100px;
     /* Positioned below the header */
     right: 20px;
     /* Slightly shifted to the left */
-    width: 250px;
-    /* Smaller width */
-    height: auto;
-    /* Let the height adjust based on the content */
-    background-color: #ffffff;
-    border-left: 2px solid #ddd;
-    /* Subtle border */
+    width: 420px;
+    /* Smaller width for a compact look */
+    background-color: #f9f9f9;
+    /* Subtle off-white background */
+    border-left: 1px solid #e1e1e1;
+    /* Lighter border for a sleek look */
     padding: 15px;
     /* Slightly reduced padding */
-    font-size: 14px;
-    overflow-wrap: break-word;
-    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
-    /* Add shadow for a subtle effect */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 12px;
+    /* Slightly smaller font for compactness */
+    border-radius: 8px;
+    /* Rounded corners for smooth, modern feel */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    /* Subtle shadow */
     z-index: 1000;
     visibility: hidden;
-    /* Initially hidden, for smooth transition */
+    /* Initially hidden */
     opacity: 0;
     /* Hidden by default */
     transition: opacity 0.3s ease, visibility 0.3s ease;
-    /* Smooth transition */
 }
 
+/* Show the div with a smooth transition */
 .hidden-info-container.show {
     visibility: visible;
-    /* Ensure visibility is changed smoothly */
     opacity: 1;
-    /* Fade in the box */
 }
 
-.hidden-info-container.hide {
-    visibility: hidden;
-    opacity: 0;
-    /* Fade out smoothly */
+/* Styling for the JSON-like content */
+.json-content {
+    background-color: #ffffff;
+    /* White background for the inner content */
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #333;
+    /* Dark text color for readability */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    /* Subtle shadow around the content */
+    overflow-wrap: break-word;
+    text-align: left;
+    /* Align text left */
+}
+
+/* Key styling */
+.json-key {
+    color: #007aff;
+    /* Subtle blue for Apple-style feel */
+    font-weight: 600;
+    /* Slightly bold for clarity */
+    font-family: monospace;
+    /* Monospace for a JSON-like look */
+}
+
+/* Value styling */
+.json-value {
+    color: #333;
+    /* Dark gray for the values */
+    font-weight: 400;
+    /* Normal weight for the values */
+    font-family: monospace;
+    /* Monospace for consistency */
+    margin-left: 10px;
+    display: inline-block;
+}
+
+/* Add some spacing between the key-value pairs */
+.json-pair {
+    margin-bottom: 8px;
 }
