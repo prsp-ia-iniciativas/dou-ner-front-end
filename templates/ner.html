@@ -92,6 +92,14 @@
         .no-entity {
             color: #333;
         }
+
+        /* Add a classification label after each entity */
+        .entity-label {
+            font-size: 12px;
+            color: #555;
+            font-weight: normal;
+            margin-left: 4px;
+        }
     </style>
 </head>
 
@@ -113,64 +121,64 @@
 
     <script>
         document.getElementById('analyze-button').addEventListener('click', function () {
-            const text = document.getElementById('input-text').value;
+                const text = document.getElementById('input-text').value;
 
-            // Send the text to the NER endpoint
-            fetch('/ner-inference', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ text: text })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    const nerResults = document.getElementById('ner-results');
-                    nerResults.innerHTML = ''; // Clear previous results
-
-                    let resultHTML = '';
-
-                    // Display the entities with highlights
-                    if (data.entities && Array.isArray(data.entities)) {
-                        data.entities.forEach((entity, index) => {
-                            let token = entity[0];  // Extract the token
-                            let label = entity[1];  // Extract the label
-
-                            // Ignore special tokens
-                            if (token === '[CLS]' || token === '[SEP]' || token === '[UNK]') {
-                                return; // Skip special tokens
-                            }
-
-                            // Handle subword tokens (tokens that start with '##')
-                            if (token.startsWith('##')) {
-                                token = token.slice(2);  // Remove '##'
-                                resultHTML += token;     // Append to previous token without space
-                            } else {
-                                // Add a space before the token unless it's punctuation or subword
-                                if (!/^[.,!?;]$/.test(token) && index > 0) {
-                                    resultHTML += ' ';
-                                }
-
-                                // Wrap recognized entities in a span with the appropriate class
-                                if (label !== 'O') {
-                                    resultHTML += `<span class="entity ${label}">${token}</span>`;
-                                } else {
-                                    // Non-entity words (no special label)
-                                    resultHTML += `<span class="no-entity">${token}</span>`;
-                                }
-                            }
-                        });
-                    } else {
-                        resultHTML = "No entities found or invalid response format.";
-                    }
-
-                    nerResults.innerHTML = resultHTML;
+                // Send the text to the NER endpoint
+                fetch('/ner-inference', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text: text })
                 })
-                .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById('ner-results').innerHTML = 'Error occurred during NER analysis.';
-                });
-        });
+                    .then(response => response.json())
+                    .then(data => {
+                        const nerResults = document.getElementById('ner-results');
+                        nerResults.innerHTML = ''; // Clear previous results
+
+                        let resultHTML = '';
+
+                        // Display the entities with highlights
+                        if (data.entities && Array.isArray(data.entities)) {
+                            data.entities.forEach((entity, index) => {
+                                let token = entity[0];  // Extract the token
+                                let label = entity[1];  // Extract the label
+
+                                // Ignore special tokens
+                                if (token === '[CLS]' || token === '[SEP]' || token === '[UNK]') {
+                                    return; // Skip special tokens
+                                }
+
+                                // Handle subword tokens (tokens that start with '##')
+                                if (token.startsWith('##')) {
+                                    token = token.slice(2);  // Remove '##'
+                                    resultHTML += token;     // Append to previous token without space
+                                } else {
+                                    // Add a space before the token unless it's punctuation or subword
+                                    if (!/^[.,!?;]$/.test(token) && index > 0) {
+                                        resultHTML += ' ';
+                                    }
+
+                                    // Wrap recognized entities in a span with the appropriate class
+                                    if (label !== 'O') {
+                                        resultHTML +=`<span class="entity ${label}">${token}<span class="entity-label">${label}</span></span>`;
+                                    } else {
+                                        // Non-entity words (no special label)
+                                        resultHTML += `<span class="no-entity">${token}</span>`;
+                                    }
+                                }
+                            });
+                        } else {
+                            resultHTML = "No entities found or invalid response format.";
+                        }
+
+                        nerResults.innerHTML = resultHTML;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        document.getElementById('ner-results').innerHTML = 'Error occurred during NER analysis.';
+                    });
+            });
     </script>
 
 </body>
