@@ -340,6 +340,70 @@ h2 {
 .json-pair {
     margin-bottom: 8px;
 }
+
+/* Timeline container */
+.timeline {
+    border-left: 3px solid #007aff;
+    /* Left border to resemble a timeline */
+    margin-left: 20px;
+    padding-left: 20px;
+    position: relative;
+}
+
+/* Individual timeline event */
+.timeline-event {
+    display: flex;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+/* Marker (dot) for the timeline */
+.timeline-marker {
+    width: 12px;
+    height: 12px;
+    background-color: #007aff;
+    border-radius: 50%;
+    position: absolute;
+    left: -27px;
+    /* Position it correctly aligned with the timeline border */
+    top: 5px;
+    /* Align with the event content */
+}
+
+/* Content inside each timeline event */
+.timeline-content {
+    padding-left: 15px;
+    /* Space between marker and content */
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Role, department, and date styling */
+.timeline-role,
+.timeline-department,
+.timeline-date {
+    margin-bottom: 5px;
+}
+
+.timeline-role .json-key,
+.timeline-department .json-key,
+.timeline-date .json-key {
+    color: #007aff;
+}
+
+.timeline-role .json-value,
+.timeline-department .json-value,
+.timeline-date .json-value {
+    color: #333;
+}
+
+/* Styling for last timeline event (optional: to avoid margin) */
+.timeline-event:last-child {
+    margin-bottom: 0;
+}
+
 /* Container to hold and align all icons */
 .icon-container {
     position: fixed;

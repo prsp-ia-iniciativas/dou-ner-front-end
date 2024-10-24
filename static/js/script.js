@@ -150,7 +150,50 @@ function createCard(person, actionType) {
     return card;
 }
 
+// Function to generate a fake timeline for the employee
+function generateFakeTimeline() {
+    const fakeTimeline = [
+        {
+            role: "Analista",
+            department: "Secretaria de Administração",
+            date: "2021-04-15"
+        },
+        {
+            role: "Coordenador",
+            department: "Secretaria de Educação",
+            date: "2022-06-10"
+        },
+        {
+            role: "Gerente",
+            department: "Secretaria de Saúde",
+            date: "2023-02-01"
+        }
+    ];
+
+    return fakeTimeline;
+}
+
+// Function to show the card information with a timeline
 function showCardInfo(person) {
+    const timeline = generateFakeTimeline();
+
+    // Build the HTML for the timeline
+    let timelineHtml = '<div class="timeline">';
+    timeline.forEach(event => {
+        timelineHtml += `
+            <div class="timeline-event">
+                <div class="timeline-marker"></div>
+                <div class="timeline-content">
+                    <div class="timeline-role"><span class="json-key">Cargo:</span> <span class="json-value">${event.role}</span></div>
+                    <div class="timeline-department"><span class="json-key">Departamento:</span> <span class="json-value">${event.department}</span></div>
+                    <div class="timeline-date"><span class="json-key">Data:</span> <span class="json-value">${event.date}</span></div>
+                </div>
+            </div>
+        `;
+    });
+    timelineHtml += '</div>';
+
+    // Construct the card information content including the timeline
     cardInfoContainer.innerHTML = `
         <div class="json-content">
             <div class="json-brace">JSON-Formatted <br /><br />{</div><br />
@@ -158,6 +201,7 @@ function showCardInfo(person) {
             <div class="json-pair"><span class="json-key">"Categoria":</span> <span class="json-value">"${person.categoria}"</span>,</div>
             <div class="json-pair"><span class="json-key">"Subcategoria":</span> <span class="json-value">"${person.subcategoria}"</span>,</div>
             <div class="json-pair"><span class="json-key">"Data":</span> <span class="json-value">"${person.data || 'Sem data'}"</span></div>
+            <div class="json-pair"><span class="json-key">"Histórico":</span><br />${timelineHtml}</div>
             <div class="json-brace">}</div>
         </div>
     `;
