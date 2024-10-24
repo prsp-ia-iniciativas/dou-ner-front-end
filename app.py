@@ -64,23 +64,47 @@ def upload_file():
     return redirect(url_for("index"))
 
 
-# Route to load the lists from JSON and send to the frontend
-@app.route("/analyze", methods=["GET"])
+# Route to handle file upload and analyze the content
+@app.route("/analyze", methods=["POST"])
 def analyze():
-    try:
-        with open("./data/lista.json") as json_file:
-            data = json.load(json_file)
-            lista_exonerados = data.get("lista_exonerados", [])
-            lista_admitidos = data.get("lista_admitidos", [])
+    if "file" not in request.files:
+        return jsonify({"error": "No file provided"}), 400
 
-            return jsonify(
-                {
-                    "lista_exonerados": lista_exonerados,
-                    "lista_admitidos": lista_admitidos,
-                }
-            )
-    except FileNotFoundError:
-        return jsonify({"error": "File not found"}), 404
+    file = request.files["file"]
+
+    if file.filename == "":
+        return jsonify({"error": "No file selected"}), 400
+
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+        file.save(file_path)
+
+        # Perform the external file upload using requests
+        try:
+            with open(file_path, "rb") as f:
+                response = requests.post(
+                    "https://demo-prodesp-demo.apps.cluster-pqppz.pqppz.sandbox745.opentlc.com",
+                    files={"file": f},
+                    headers={"Accept": "application/json"},
+                )
+
+            # Check the response from the external server
+            if response.status_code == 200:
+                # Return the JSON response to the frontend
+                return jsonify(response.json())
+            else:
+                return (
+                    jsonify(
+                        {"error": "Failed to analyze file", "details": response.text}
+                    ),
+                    response.status_code,
+                )
+
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+    return jsonify({"error": "Invalid file type"}), 400
 
 
 if __name__ == "__main__":

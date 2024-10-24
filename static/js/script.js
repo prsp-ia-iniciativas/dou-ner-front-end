@@ -4,6 +4,8 @@ const uploadedFiles = document.getElementById('uploaded-files');
 const analyzeButton = document.getElementById('analyze-button');
 const exoneradosContainer = document.getElementById('exonerados-container');
 const nomeadosContainer = document.getElementById('nomeados-container');
+const loadingSpinner = document.getElementById('loading-spinner'); // Add the spinner reference
+let selectedFile = null;
 
 // Click to browse files
 dropArea.addEventListener('click', function () {
@@ -37,21 +39,41 @@ fileInput.addEventListener('change', function () {
 // Handle file upload
 function handleFileUpload(files) {
     if (files.length > 0) {
+        selectedFile = files[0]; // Store the selected file
         const fileName = files[0].name;
         uploadedFiles.textContent = "Uploaded file: " + fileName;
         analyzeButton.disabled = false; // Enable "Analisar" button
     }
 }
 
-// Fetch data from the JSON file and animate cards
+// Fetch data by uploading the PDF and animate cards
 analyzeButton.addEventListener('click', function () {
-    fetch('/analyze')
+    if (!selectedFile) {
+        alert("Please upload a file first!");
+        return;
+    }
+
+    // Show the loading spinner
+    loadingSpinner.style.display = 'flex';
+
+    // Create a FormData object to send the file
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    // Make the POST request to the /analyze endpoint
+    fetch('/analyze', {
+        method: 'POST',
+        body: formData
+    })
         .then(response => response.json())
         .then(data => {
             if (data.error) {
                 alert('Error: ' + data.error);
                 return;
             }
+
+            // Hide the loading spinner once data is loaded
+            loadingSpinner.style.display = 'none';
 
             // Store fetched data in jsonData for later use (in email preview)
             jsonData = data;
@@ -61,14 +83,16 @@ analyzeButton.addEventListener('click', function () {
             nomeadosContainer.innerHTML = '';
 
             // Populate and animate the cards
-            renderCards(data.lista_exonerados, exoneradosContainer, 'exoneração');
-            renderCards(data.lista_admitidos, nomeadosContainer, 'admissão');
+            renderCards(data.exoneração, exoneradosContainer, 'exoneração');
+            renderCards(data.nomeação, nomeadosContainer, 'nomeação');
         })
         .catch(error => {
-            alert('Error fetching data: ' + error);
+            alert('Error analyzing the file: ' + error);
+
+            // Hide the loading spinner in case of an error
+            loadingSpinner.style.display = 'none';
         });
 });
-
 
 // Function to render the cards with hover and click interactions
 function renderCards(peopleList, container, actionType) {
@@ -113,7 +137,7 @@ function createCard(person, actionType) {
     icon.innerHTML = '👤'; // Use an emoji or custom icon
     const name = document.createElement('div');
     name.classList.add('card-name');
-    name.textContent = person.nome;
+    name.textContent = person;
 
     header.appendChild(icon);
     header.appendChild(name);
@@ -147,7 +171,7 @@ function showCardInfo(person) {
     cardInfoContainer.innerHTML = `
         <div class="json-content">
             <div class="json-brace">JSON-Formatted <br /><br />{</div><br />
-            <div class="json-pair"><span class="json-key">"Nome":</span> <span class="json-value">"${person.nome}"</span>,</div>
+            <div class="json-pair"><span class="json-key">"Nome":</span> <span class="json-value">"${person}"</span>,</div>
             <div class="json-pair"><span class="json-key">"Categoria":</span> <span class="json-value">"${person.categoria}"</span>,</div>
             <div class="json-pair"><span class="json-key">"Subcategoria":</span> <span class="json-value">"${person.subcategoria}"</span>,</div>
             <div class="json-pair"><span class="json-key">"Data":</span> <span class="json-value">"${person.data || 'Sem data'}"</span></div>
