@@ -57,9 +57,15 @@ function updateUploadedFileUI(fileName) {
     uploadedFiles.textContent = `Uploaded file: ${fileName}`;
 }
 
-// Handle the loading spinner visibility
+// Handle the loading spinner visibility with fade-in effect
 function showLoading(isLoading) {
-    loadingSpinner.style.display = isLoading ? 'flex' : 'none';
+    if (isLoading) {
+        loadingSpinner.style.display = 'flex'; // Show the spinner
+        setTimeout(() => loadingSpinner.classList.add('show'), 10); // Add class to fade in
+    } else {
+        loadingSpinner.classList.remove('show'); // Fade out
+        setTimeout(() => loadingSpinner.style.display = 'none', 300); // Hide after fade-out
+    }
 }
 
 // Make the API request to analyze the file
