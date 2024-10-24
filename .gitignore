@@ -163,8 +163,6 @@ cython_debug/
 
 data
 
-*.txt
-
 fine-tuned-bert
 
 fine-tuned-bert-insights

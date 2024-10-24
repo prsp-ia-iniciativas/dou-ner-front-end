@@ -1,0 +1,6 @@
+Flask
+Werkzeug
+transformers
+requests
+torch
+spacy

@@ -56,34 +56,34 @@
             margin: 0 2px;
             font-weight: bold;
         }
-
-        /* Specific entity colors */
-        .PESSOA {
+        
+        /* Specific entity colors for B- and I- tags */
+        .B-PESSOA, .I-PESSOA {
             background-color: #FFCDD2;
             color: #B71C1C;
         }
 
-        .ORGANIZACAO {
+        .B-ORGANIZACAO, .I-ORGANIZACAO {
             background-color: #C8E6C9;
             color: #388E3C;
         }
 
-        .LOCAL {
+        .B-LOCAL, .I-LOCAL {
             background-color: #BBDEFB;
             color: #1976D2;
         }
 
-        .TEMPO {
+        .B-TEMPO, .I-TEMPO {
             background-color: #FFF9C4;
             color: #FBC02D;
         }
 
-        .LEGISLACAO {
+        .B-LEGISLACAO, .I-LEGISLACAO {
             background-color: #E1BEE7;
             color: #8E24AA;
         }
 
-        .VALOR {
+        .B-VALOR, .I-VALOR {
             background-color: #E1F5FE;
             color: #0288D1;
         }
@@ -121,64 +121,55 @@
 
     <script>
         document.getElementById('analyze-button').addEventListener('click', function () {
-                const text = document.getElementById('input-text').value;
+            const text = document.getElementById('input-text').value;
 
-                // Send the text to the NER endpoint
-                fetch('/ner-inference', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ text: text })
+            // Send the text to the NER endpoint
+            fetch('/ner-inference', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ text: text })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const nerResults = document.getElementById('ner-results');
+                    let resultHTML = ''; // To store the final HTML output
+
+                    if (data.entities && Array.isArray(data.entities)) {
+                        let lastEnd = 0;
+
+                        // Loop through each identified entity
+                        data.entities.forEach((entity) => {
+                            const entityText = entity[0];  // Entity word
+                            const entityLabel = entity[1];  // Entity label
+                            const start = entity[2];        // Start position of the entity
+                            const end = entity[3];          // End position of the entity
+
+                            // Add the text before the entity (non-entity text)
+                            resultHTML += text.slice(lastEnd, start);
+
+                            // Add the entity itself with a span for highlighting
+                            resultHTML += `<span class="entity ${entityLabel}">${text.slice(start, end)}<span class="entity-label">${entityLabel}</span></span>`;
+
+                            // Update the last end position
+                            lastEnd = end;
+                        });
+
+                        // Add the rest of the text after the last entity
+                        resultHTML += text.slice(lastEnd);
+                    } else {
+                        resultHTML = "No entities found or invalid response format.";
+                    }
+
+                    // Update the results div with the generated HTML
+                    nerResults.innerHTML = resultHTML;
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        const nerResults = document.getElementById('ner-results');
-                        nerResults.innerHTML = ''; // Clear previous results
-
-                        let resultHTML = '';
-
-                        // Display the entities with highlights
-                        if (data.entities && Array.isArray(data.entities)) {
-                            data.entities.forEach((entity, index) => {
-                                let token = entity[0];  // Extract the token
-                                let label = entity[1];  // Extract the label
-
-                                // Ignore special tokens
-                                if (token === '[CLS]' || token === '[SEP]' || token === '[UNK]') {
-                                    return; // Skip special tokens
-                                }
-
-                                // Handle subword tokens (tokens that start with '##')
-                                if (token.startsWith('##')) {
-                                    token = token.slice(2);  // Remove '##'
-                                    resultHTML += token;     // Append to previous token without space
-                                } else {
-                                    // Add a space before the token unless it's punctuation or subword
-                                    if (!/^[.,!?;]$/.test(token) && index > 0) {
-                                        resultHTML += ' ';
-                                    }
-
-                                    // Wrap recognized entities in a span with the appropriate class
-                                    if (label !== 'O') {
-                                        resultHTML +=`<span class="entity ${label}">${token}<span class="entity-label">${label}</span></span>`;
-                                    } else {
-                                        // Non-entity words (no special label)
-                                        resultHTML += `<span class="no-entity">${token}</span>`;
-                                    }
-                                }
-                            });
-                        } else {
-                            resultHTML = "No entities found or invalid response format.";
-                        }
-
-                        nerResults.innerHTML = resultHTML;
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        document.getElementById('ner-results').innerHTML = 'Error occurred during NER analysis.';
-                    });
-            });
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('ner-results').innerHTML = 'Error occurred during NER analysis.';
+                });
+        });
     </script>
 
 </body>

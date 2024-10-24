@@ -45,20 +45,21 @@ model_name = "marquesafonso/bertimbau-large-ner-selective"
 model = AutoModelForTokenClassification.from_pretrained(model_name)
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-pipe = pipeline(
-    "ner",
-    model="marquesafonso/bertimbau-large-ner-selective",
-    aggregation_strategy="simple",
-)
+model_name = "pierreguillou/ner-bert-base-cased-pt-lenerbr"
+
+pipe = pipeline("ner", model=model_name)
 
 def get_ner_predictions(input_text):
     # Use the pipeline to get NER predictions
-    results = pipe([input_text])
-
+    results = pipe(input_text)
+    
     # Prepare the list of entities
     predicted_entities = []
-    for entity in results[0]:
-        predicted_entities.append((entity["word"], entity["entity_group"]))
+    for entity in results:
+        # Include entity word and label
+        predicted_entities.append(
+            (entity["word"], entity["entity"], entity["start"], entity["end"])
+        )
 
     return predicted_entities
 
@@ -205,21 +206,24 @@ def analyze():
 @app.route("/ner-inference", methods=["POST"])
 def ner_inference():
     try:
+        # Extract the input text from the request
         data = request.json
         text = data.get("text", "")
-        print(data)
+        print(text)
 
-        if not text:
+        # Ensure text is provided
+        if not text.strip():
             return jsonify({"error": "No text provided"}), 400
 
-        # Get NER predictions
+        # Get NER predictions using the get_ner_predictions function
         entities = get_ner_predictions(text)
         print(entities)
 
-        # Return predictions as JSON
+        # Return the entities found in the text
         return jsonify({"entities": entities})
 
     except Exception as e:
+        # Log the error and return a 500 response
         return jsonify({"error": str(e)}), 500
 
 
