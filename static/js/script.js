@@ -118,7 +118,7 @@ function clearContainers() {
 function renderCards(peopleList, container, actionType) {
     peopleList.forEach((person, index) => {
         const card = createCard(person, actionType);
-        card.style.animationDelay = `${index * 0.2}s`; // Staggered animation
+        card.style.animationDelay = `${index * 0.4}s`; // Staggered animation
         card.classList.add('show-card');
         container.appendChild(card);
     });
