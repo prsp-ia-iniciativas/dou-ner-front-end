@@ -1,179 +1,155 @@
+// DOM Elements
 const dropArea = document.getElementById('drop-area');
 const fileInput = document.getElementById('file-upload');
 const uploadedFiles = document.getElementById('uploaded-files');
 const analyzeButton = document.getElementById('analyze-button');
 const exoneradosContainer = document.getElementById('exonerados-container');
 const nomeadosContainer = document.getElementById('nomeados-container');
-const loadingSpinner = document.getElementById('loading-spinner'); // Add the spinner reference
+const loadingSpinner = document.getElementById('loading-spinner');
+const cardInfoContainer = document.getElementById('card-info-container');
+const modal = document.getElementById("data-email-modal");
+const mailIcon = document.getElementById("mail-icon");
+const closeModal = document.getElementById("close-email-modal");
+const emailForm = document.getElementById("email-subscription-form");
+
+const chatbotIcon = document.getElementById('chatbot-icon');
+const chatbotModal = document.getElementById('chatbot-modal');
+const chatbotClose = document.getElementById('chatbot-close');
+const chatbotSend = document.getElementById('chatbot-send');
+const chatbotInput = document.getElementById('chatbot-input');
+const chatbotMessages = document.getElementById('chatbot-messages');
+
 let selectedFile = null;
+let jsonData = null;
 
-// Click to browse files
-dropArea.addEventListener('click', function () {
-    fileInput.click();
-});
+// Setup file handling and drag-and-drop events
+function setupDragAndDrop() {
+    dropArea.addEventListener('click', () => fileInput.click());
 
-// Drag-and-drop functionality
-dropArea.addEventListener('dragover', function (e) {
-    e.preventDefault();
-    dropArea.style.backgroundColor = '#e9e9e9';
-});
+    dropArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropArea.style.backgroundColor = '#e9e9e9';
+    });
 
-dropArea.addEventListener('dragleave', function () {
-    dropArea.style.backgroundColor = '#f9f9f9';
-});
+    dropArea.addEventListener('dragleave', () => {
+        dropArea.style.backgroundColor = '#f9f9f9';
+    });
 
-dropArea.addEventListener('drop', function (e) {
-    e.preventDefault();
-    dropArea.style.backgroundColor = '#f9f9f9';
+    dropArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropArea.style.backgroundColor = '#f9f9f9';
+        handleFileUpload(e.dataTransfer.files);
+    });
 
-    const files = e.dataTransfer.files;
-    handleFileUpload(files);
-});
+    fileInput.addEventListener('change', () => handleFileUpload(fileInput.files));
+}
 
-// Handle file selection via file input
-fileInput.addEventListener('change', function () {
-    const files = fileInput.files;
-    handleFileUpload(files);
-});
-
-// Handle file upload
+// Handle file selection
 function handleFileUpload(files) {
     if (files.length > 0) {
-        selectedFile = files[0]; // Store the selected file
-        const fileName = files[0].name;
-        uploadedFiles.textContent = "Uploaded file: " + fileName;
-        analyzeButton.disabled = false; // Enable "Analisar" button
+        selectedFile = files[0];
+        updateUploadedFileUI(files[0].name);
+        analyzeButton.disabled = false;
     }
 }
 
-// Fetch data by uploading the PDF and animate cards
-analyzeButton.addEventListener('click', function () {
+function updateUploadedFileUI(fileName) {
+    uploadedFiles.textContent = `Uploaded file: ${fileName}`;
+}
+
+// Handle the loading spinner visibility
+function showLoading(isLoading) {
+    loadingSpinner.style.display = isLoading ? 'flex' : 'none';
+}
+
+// Make the API request to analyze the file
+function analyzeFile() {
     if (!selectedFile) {
-        alert("Please upload a file first!");
+        showError("Please upload a file first!");
         return;
     }
 
-    // Show the loading spinner
-    loadingSpinner.style.display = 'flex';
+    showLoading(true);
 
-    // Create a FormData object to send the file
     const formData = new FormData();
     formData.append("file", selectedFile);
 
-    // Make the POST request to the /analyze endpoint
-    fetch('/analyze', {
+    makeApiRequest('/analyze', formData)
+        .then(handleApiResponse)
+        .catch((error) => showError(`Error analyzing the file: ${error}`))
+        .finally(() => showLoading(false));
+}
+
+function makeApiRequest(url, formData) {
+    return fetch(url, {
         method: 'POST',
-        body: formData
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                alert('Error: ' + data.error);
-                return;
-            }
+        body: formData,
+    }).then(response => response.json());
+}
 
-            // Hide the loading spinner once data is loaded
-            loadingSpinner.style.display = 'none';
+function handleApiResponse(data) {
+    if (data.error) {
+        showError(data.error);
+        return;
+    }
 
-            // Store fetched data in jsonData for later use (in email preview)
-            jsonData = data;
+    jsonData = data;  // Store the result for later use (e.g. in the email modal)
+    clearContainers();
+    renderCards(data.exoneração, exoneradosContainer, 'exoneração');
+    renderCards(data.nomeação, nomeadosContainer, 'nomeação');
+}
 
-            // Clear the previous cards
-            exoneradosContainer.innerHTML = '';
-            nomeadosContainer.innerHTML = '';
+function showError(errorMessage) {
+    alert(errorMessage);
+}
 
-            // Populate and animate the cards
-            renderCards(data.exoneração, exoneradosContainer, 'exoneração');
-            renderCards(data.nomeação, nomeadosContainer, 'nomeação');
-        })
-        .catch(error => {
-            alert('Error analyzing the file: ' + error);
+function clearContainers() {
+    exoneradosContainer.innerHTML = '';
+    nomeadosContainer.innerHTML = '';
+}
 
-            // Hide the loading spinner in case of an error
-            loadingSpinner.style.display = 'none';
-        });
-});
-
-// Function to render the cards with hover and click interactions
+// Render cards for each person (exoneração/nomeação)
 function renderCards(peopleList, container, actionType) {
     peopleList.forEach((person, index) => {
         const card = createCard(person, actionType);
         card.style.animationDelay = `${index * 0.2}s`; // Staggered animation
-        card.classList.add('show-card'); // Add animation class
-
-        // Apply the background color based on actionType (exoneração/nomeação)
-        if (actionType === 'exoneração') {
-            card.classList.add('exonerado'); // Apply soft red background for exonerados
-        } else if (actionType === 'admissão') {
-            card.classList.add('nomeado'); // Apply soft green background for nomeados
-        }
-
-        // Add hover event to show card info
-        card.addEventListener('mouseenter', () => showCardInfo(person));
-        card.addEventListener('mouseleave', hideCardInfo);
-
-        // Add click event to open the link in a new tab
-        card.addEventListener('click', function () {
-            window.open("https://www.doe.sp.gov.br/executivo/universidade-de-sao-paulo/despachos-do-reitor-de-18-de-outubro-de-2024-20241021123911227666932", '_blank');
-        });
-
-        // Append the card with a slight delay
-        setTimeout(() => {
-            container.appendChild(card);
-        }, index * 200);
+        card.classList.add('show-card');
+        container.appendChild(card);
     });
 }
 
-// Function to create a card with the necessary info
 function createCard(person, actionType) {
     const card = document.createElement('div');
-    card.classList.add('card');
+    card.classList.add('card', actionType === 'exoneração' ? 'exonerado' : 'nomeado');
 
-    // Card header
-    const header = document.createElement('div');
-    header.classList.add('card-header');
-    const icon = document.createElement('span');
-    icon.classList.add('person-icon');
-    icon.innerHTML = '👤'; // Use an emoji or custom icon
-    const name = document.createElement('div');
-    name.classList.add('card-name');
-    name.textContent = person;
+    card.innerHTML = `
+        <div class="card-header">
+            <span class="person-icon">👤</span>
+            <div class="card-name">${person}</div>
+        </div>
+        <div class="card-category">${person.categoria || 'Categoria não disponível'}</div>
+        <div class="card-subcategory">${person.subcategoria || 'Subcategoria não disponível'}</div>
+        <div class="card-date">${person.data || 'Sem data'}</div>
+    `;
 
-    header.appendChild(icon);
-    header.appendChild(name);
-    card.appendChild(header);
+    card.addEventListener('mouseenter', () => showCardInfo(person));
+    card.addEventListener('mouseleave', hideCardInfo);
 
-    // Category
-    const category = document.createElement('div');
-    category.classList.add('card-category');
-    category.textContent = person.categoria;
-    card.appendChild(category);
-
-    // Subcategory
-    const subcategory = document.createElement('div');
-    subcategory.classList.add('card-subcategory');
-    subcategory.textContent = person.subcategoria;
-    card.appendChild(subcategory);
-
-    // Date (optional)
-    const date = document.createElement('div');
-    date.classList.add('card-date');
-    date.textContent = person.data || 'Sem data'; // Default to "Sem data" if not provided
-    card.appendChild(date);
+    // Add click event to open the link in a new tab
+    card.addEventListener('click', function () {
+        window.open("https://www.doe.sp.gov.br/executivo/universidade-de-sao-paulo/despachos-do-reitor-de-18-de-outubro-de-2024-20241021123911227666932", '_blank');
+    });
 
     return card;
 }
 
-
-// Show card information in the fixed div (formatted as real JSON)
 function showCardInfo(person) {
-    const cardInfoContainer = document.getElementById('card-info-container');
     cardInfoContainer.innerHTML = `
         <div class="json-content">
             <div class="json-brace">JSON-Formatted <br /><br />{</div><br />
             <div class="json-pair"><span class="json-key">"Nome":</span> <span class="json-value">"${person}"</span>,</div>
-            <div class="json-pair"><span class="json-key">"Categoria":</span> <span class="json-value">"${person.categoria}"</span>,</div>
-            <div class="json-pair"><span class="json-key">"Subcategoria":</span> <span class="json-value">"${person.subcategoria}"</span>,</div>
+            <div class="json-pair"><span class="json-key">"Categoria":</span> <span class="json-value">"CATEGORIA"</span>,</div>
+            <div class="json-pair"><span class="json-key">"Subcategoria":</span> <span class="json-value">"SUB-CATEGORIA"</span>,</div>
             <div class="json-pair"><span class="json-key">"Data":</span> <span class="json-value">"${person.data || 'Sem data'}"</span></div>
             <div class="json-brace">}</div>
         </div>
@@ -182,140 +158,97 @@ function showCardInfo(person) {
     cardInfoContainer.classList.remove('hide');
 }
 
-
-// Hide the fixed div
 function hideCardInfo() {
-    const cardInfoContainer = document.getElementById('card-info-container');
     cardInfoContainer.classList.add('hide');
     cardInfoContainer.classList.remove('show');
 }
 
-// Get elements
-const chatbotIcon = document.getElementById('chatbot-icon');
-const chatbotModal = document.getElementById('chatbot-modal');
-const chatbotClose = document.getElementById('chatbot-close');
-const chatbotSend = document.getElementById('chatbot-send');
-const chatbotInput = document.getElementById('chatbot-input');
-const chatbotMessages = document.getElementById('chatbot-messages');
+// Modal handling for showing email preview
+mailIcon.onclick = function () {
+    if (jsonData) {
+        toggleModal(modal, true);
+        populateEmailPreview(jsonData);
+    } else {
+        alert('Please analyze the data first.');
+    }
+};
 
-// Open the chatbot modal when the icon is clicked
+function populateEmailPreview(data) {
+    const exoneradosList = document.getElementById('exonerados-list');
+    const nomeadosList = document.getElementById('nomeados-list');
+
+    exoneradosList.innerHTML = '';
+    nomeadosList.innerHTML = '';
+
+    data.exoneração.forEach(person => {
+        const listItem = document.createElement('li');
+        listItem.textContent = person;
+        exoneradosList.appendChild(listItem);
+    });
+
+    data.nomeação.forEach(person => {
+        const listItem = document.createElement('li');
+        listItem.textContent = person;
+        nomeadosList.appendChild(listItem);
+    });
+}
+
+function toggleModal(modalElement, isVisible) {
+    modalElement.style.display = isVisible ? 'block' : 'none';
+}
+
+closeModal.onclick = () => toggleModal(modal, false);
+window.onclick = event => { if (event.target == modal) toggleModal(modal, false); };
+
+// Handle email subscription form submission
+emailForm.addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    const email = document.getElementById('email').value;
+    alert(`You will receive this data at: ${email}`);
+    toggleModal(modal, false);
+});
+
+// Chatbot functionality
 chatbotIcon.addEventListener('click', function () {
-    chatbotModal.style.display = 'block';
+    toggleModal(chatbotModal, true);
 
-    // Display initial bot message only if no messages are present
     if (chatbotMessages.children.length === 0) {
         const initialBotMessageDiv = document.createElement('div');
         initialBotMessageDiv.classList.add('chatbot-message', 'bot-message');
         initialBotMessageDiv.textContent = 'Olá! Como posso ajudar você hoje?';
         chatbotMessages.appendChild(initialBotMessageDiv);
 
-        // Scroll to the bottom of the messages
         chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
     }
 });
 
-// Close the chatbot modal when the close button is clicked
-chatbotClose.addEventListener('click', function () {
-    chatbotModal.style.display = 'none';
-});
+chatbotClose.addEventListener('click', () => toggleModal(chatbotModal, false));
 
-// Send message when the "Enviar" button is clicked
 chatbotSend.addEventListener('click', function () {
     const userMessage = chatbotInput.value.trim();
 
     if (userMessage) {
-        // Display user message
         const userMessageDiv = document.createElement('div');
         userMessageDiv.classList.add('chatbot-message', 'user-message');
         userMessageDiv.textContent = userMessage;
         chatbotMessages.appendChild(userMessageDiv);
 
-        // Scroll to the bottom of the messages
         chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
 
-        // Clear input field
         chatbotInput.value = '';
 
-        // Simulate chatbot response
         setTimeout(function () {
             const botMessageDiv = document.createElement('div');
             botMessageDiv.classList.add('chatbot-message', 'bot-message');
             botMessageDiv.textContent = 'Posso ajudar com mais alguma coisa?';
             chatbotMessages.appendChild(botMessageDiv);
 
-            // Scroll to the bottom of the messages
             chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
-        }, 1000); // Simulate a delay for the bot response
+        }, 1000);
     }
 });
 
-// Get the modal and form elements
-var modal = document.getElementById("data-email-modal");
-var mailIcon = document.getElementById("mail-icon");
-var closeModal = document.getElementById("close-email-modal");
-var emailForm = document.getElementById("email-subscription-form");
-
-// Handle opening the modal and populating the email preview
-mailIcon.onclick = function () {
-    if (jsonData) {
-        modal.style.display = "block"; // Open the modal
-        populateEmailPreview(jsonData); // Load the email content
-    } else {
-        alert('Please analyze the data first.');
-    }
-};
-
-// Close the modal when clicking on the close button
-closeModal.onclick = function () {
-    modal.style.display = "none";
-};
-
-// Close the modal when clicking outside the modal
-window.onclick = function (event) {
-    if (event.target == modal) {
-        modal.style.display = "none";
-    }
-};
-
-// Populate the email content preview inside the modal
-function populateEmailPreview(data) {
-    const exoneradosList = document.getElementById('exonerados-list');
-    const nomeadosList = document.getElementById('nomeados-list');
-
-    // Clear previous content
-    exoneradosList.innerHTML = '';
-    nomeadosList.innerHTML = '';
-
-    // Populate exonerados list
-    data.lista_exonerados.forEach(person => {
-        const listItem = document.createElement('li');
-        listItem.innerHTML = `
-            ${person.nome} | ${person.categoria} | ${person.subcategoria} | ${person.data}
-        `;
-        exoneradosList.appendChild(listItem);
-    });
-
-    // Populate nomeados list
-    data.lista_admitidos.forEach(person => {
-        const listItem = document.createElement('li');
-        listItem.innerHTML = `
-            ${person.nome} | ${person.categoria} | ${person.subcategoria} | ${person.data}
-        `;
-        nomeadosList.appendChild(listItem);
-    });
-}
-
-// Handle email subscription form submission
-emailForm.addEventListener('submit', function (event) {
-    event.preventDefault(); // Prevent the default form submission behavior
-
-    // Get the entered email
-    const email = document.getElementById('email').value;
-
-    // Simulate sending email (this is where you'd connect to the backend)
-    alert(`You will receive this data at: ${email}`);
-
-    // Optionally, close the modal after submission
-    modal.style.display = "none";
-});
-
+// Initialize drag and drop functionality
+setupDragAndDrop();
+analyzeButton.addEventListener('click', analyzeFile);
