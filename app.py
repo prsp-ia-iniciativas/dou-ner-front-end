@@ -4,7 +4,16 @@ import os
 import json
 import requests
 import random
+import torch
 from datetime import datetime, timedelta
+from transformers import AutoModelForTokenClassification, AutoTokenizer
+from transformers import pipeline
+
+app = Flask(__name__)
+
+# Configurations for file upload
+app.config["UPLOAD_FOLDER"] = "./uploads"
+os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
 # Sample fake data for categories and subcategories
 CATEGORIES = [
@@ -31,12 +40,27 @@ SUBCATEGORIES = [
     "Coordenadoria de Transporte",
 ]
 
+# Load the pre-trained model and tokenizer
+model_name = "marquesafonso/bertimbau-large-ner-selective"
+model = AutoModelForTokenClassification.from_pretrained(model_name)
+tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-app = Flask(__name__)
+pipe = pipeline(
+    "ner",
+    model="marquesafonso/bertimbau-large-ner-selective",
+    aggregation_strategy="simple",
+)
 
-# Configurations for file upload
-app.config["UPLOAD_FOLDER"] = "./uploads"
-os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+def get_ner_predictions(input_text):
+    # Use the pipeline to get NER predictions
+    results = pipe([input_text])
+
+    # Prepare the list of entities
+    predicted_entities = []
+    for entity in results[0]:
+        predicted_entities.append((entity["word"], entity["entity_group"]))
+
+    return predicted_entities
 
 
 # Generate a random date within the last year
@@ -67,6 +91,9 @@ def allowed_file(filename):
 def index():
     return render_template("index.html")
 
+@app.route("/ner")
+def ner():
+    return render_template("ner.html")
 
 # Route to handle file upload
 @app.route("/upload", methods=["POST"])
@@ -175,6 +202,26 @@ def analyze():
     return jsonify({"error": "Invalid file type"}), 400
 
 
+@app.route("/ner-inference", methods=["POST"])
+def ner_inference():
+    try:
+        data = request.json
+        text = data.get("text", "")
+        print(data)
+
+        if not text:
+            return jsonify({"error": "No text provided"}), 400
+
+        # Get NER predictions
+        entities = get_ner_predictions(text)
+        print(entities)
+
+        # Return predictions as JSON
+        return jsonify({"entities": entities})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 if __name__ == "__main__":
     app.run(debug=True)
-

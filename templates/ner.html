@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NER Analysis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        textarea {
+            width: 98%;
+            /* Full width inside the container */
+            height: 150px;
+            padding: 10px;
+            border: 2px solid #007aff;
+            border-radius: 8px;
+            font-size: 16px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            resize: none;
+            /* Prevent resizing to maintain layout */
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            background-color: #007aff;
+            color: white;
+            text-align: center;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        button:hover {
+            background-color: #005fcb;
+        }
+
+        #ner-results {
+            margin-top: 30px;
+            font-size: 16px;
+            line-height: 1.6;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+            white-space: pre-wrap;
+        }
+
+        .entity {
+            padding: 2px 4px;
+            border-radius: 4px;
+            margin: 0 2px;
+            font-weight: bold;
+        }
+
+        /* Specific entity colors */
+        .PESSOA {
+            background-color: #FFCDD2;
+            color: #B71C1C;
+        }
+
+        .ORGANIZACAO {
+            background-color: #C8E6C9;
+            color: #388E3C;
+        }
+
+        .LOCAL {
+            background-color: #BBDEFB;
+            color: #1976D2;
+        }
+
+        .TEMPO {
+            background-color: #FFF9C4;
+            color: #FBC02D;
+        }
+
+        .LEGISLACAO {
+            background-color: #E1BEE7;
+            color: #8E24AA;
+        }
+
+        .VALOR {
+            background-color: #E1F5FE;
+            color: #0288D1;
+        }
+
+        /* Style to handle non-entity text */
+        .no-entity {
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- Add the image at the top -->
+        <div class="logo-container">
+            <img src="{{ url_for('static', filename='images/sp.jpeg') }}" alt="São Paulo Governo Logo" class="logo">
+        </div>
+
+        <h1>Named Entity Recognition (NER) Analyzer</h1>
+
+        <textarea id="input-text" placeholder="Enter the text you want to analyze..."></textarea>
+        <button id="analyze-button">Analisar</button>
+
+        <div id="ner-results"></div>
+    </div>
+
+    <script>
+        document.getElementById('analyze-button').addEventListener('click', function () {
+            const text = document.getElementById('input-text').value;
+
+            // Send the text to the NER endpoint
+            fetch('/ner-inference', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ text: text })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const nerResults = document.getElementById('ner-results');
+                    nerResults.innerHTML = ''; // Clear previous results
+
+                    let resultHTML = '';
+
+                    // Display the entities with highlights
+                    if (data.entities && Array.isArray(data.entities)) {
+                        data.entities.forEach((entity, index) => {
+                            let token = entity[0];  // Extract the token
+                            let label = entity[1];  // Extract the label
+
+                            // Ignore special tokens
+                            if (token === '[CLS]' || token === '[SEP]' || token === '[UNK]') {
+                                return; // Skip special tokens
+                            }
+
+                            // Handle subword tokens (tokens that start with '##')
+                            if (token.startsWith('##')) {
+                                token = token.slice(2);  // Remove '##'
+                                resultHTML += token;     // Append to previous token without space
+                            } else {
+                                // Add a space before the token unless it's punctuation or subword
+                                if (!/^[.,!?;]$/.test(token) && index > 0) {
+                                    resultHTML += ' ';
+                                }
+
+                                // Wrap recognized entities in a span with the appropriate class
+                                if (label !== 'O') {
+                                    resultHTML += `<span class="entity ${label}">${token}</span>`;
+                                } else {
+                                    // Non-entity words (no special label)
+                                    resultHTML += `<span class="no-entity">${token}</span>`;
+                                }
+                            }
+                        });
+                    } else {
+                        resultHTML = "No entities found or invalid response format.";
+                    }
+
+                    nerResults.innerHTML = resultHTML;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('ner-results').innerHTML = 'Error occurred during NER analysis.';
+                });
+        });
+    </script>
+
+</body>
+
+</html>
