@@ -53,6 +53,9 @@ analyzeButton.addEventListener('click', function () {
                 return;
             }
 
+            // Store fetched data in jsonData for later use (in email preview)
+            jsonData = data;
+
             // Clear the previous cards
             exoneradosContainer.innerHTML = '';
             nomeadosContainer.innerHTML = '';
@@ -222,28 +225,73 @@ chatbotSend.addEventListener('click', function () {
     }
 });
 
-// Get the modal
-var modal = document.getElementById("email-modal");
-
-// Get the button that opens the modal (the mail icon)
+// Get the modal and form elements
+var modal = document.getElementById("data-email-modal");
 var mailIcon = document.getElementById("mail-icon");
+var closeModal = document.getElementById("close-email-modal");
+var emailForm = document.getElementById("email-subscription-form");
 
-// Get the <span> element that closes the modal
-var closeModal = document.getElementById("close-modal");
-
-// When the user clicks the mail icon, open the modal
+// Handle opening the modal and populating the email preview
 mailIcon.onclick = function () {
-    modal.style.display = "block";
-}
+    if (jsonData) {
+        modal.style.display = "block"; // Open the modal
+        populateEmailPreview(jsonData); // Load the email content
+    } else {
+        alert('Please analyze the data first.');
+    }
+};
 
-// When the user clicks on <span> (x), close the modal
+// Close the modal when clicking on the close button
 closeModal.onclick = function () {
     modal.style.display = "none";
-}
+};
 
-// When the user clicks anywhere outside of the modal, close it
+// Close the modal when clicking outside the modal
 window.onclick = function (event) {
     if (event.target == modal) {
         modal.style.display = "none";
     }
+};
+
+// Populate the email content preview inside the modal
+function populateEmailPreview(data) {
+    const exoneradosList = document.getElementById('exonerados-list');
+    const nomeadosList = document.getElementById('nomeados-list');
+
+    // Clear previous content
+    exoneradosList.innerHTML = '';
+    nomeadosList.innerHTML = '';
+
+    // Populate exonerados list
+    data.lista_exonerados.forEach(person => {
+        const listItem = document.createElement('li');
+        listItem.innerHTML = `
+            ${person.nome} | ${person.categoria} | ${person.subcategoria} | ${person.data}
+        `;
+        exoneradosList.appendChild(listItem);
+    });
+
+    // Populate nomeados list
+    data.lista_admitidos.forEach(person => {
+        const listItem = document.createElement('li');
+        listItem.innerHTML = `
+            ${person.nome} | ${person.categoria} | ${person.subcategoria} | ${person.data}
+        `;
+        nomeadosList.appendChild(listItem);
+    });
 }
+
+// Handle email subscription form submission
+emailForm.addEventListener('submit', function (event) {
+    event.preventDefault(); // Prevent the default form submission behavior
+
+    // Get the entered email
+    const email = document.getElementById('email').value;
+
+    // Simulate sending email (this is where you'd connect to the backend)
+    alert(`You will receive this data at: ${email}`);
+
+    // Optionally, close the modal after submission
+    modal.style.display = "none";
+});
+

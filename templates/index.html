@@ -100,14 +100,37 @@
     </div>
 
     <!-- Email Subscription Modal -->
-    <div id="email-modal" class="modal">
+    <div id="data-email-modal" class="modal">
         <div class="modal-content">
-            <span class="close" id="close-modal">&times;</span>
+            <span class="close" id="close-email-modal">&times;</span>
             <h2>Subscribe to our Newsletter</h2>
-            <form id="email-form">
-                <label for="email">Enter your email:</label>
+            <h2>Email Preview</h2>
+            
+            <div id="email-content-preview" class="email-preview">
+                <p>Hi,
+                <br />Here's the latest update from the Diário Oficial:</p>
+            
+                <!-- Exonerados List -->
+                <p><strong>Lista de Exonerados:</strong></p>
+                <div id="exonerados-list">
+                    <ul id="exonerados-items"></ul>
+                </div>
+                
+                <!-- Nomeados List -->
+                <p><strong>Lista de Nomeados:</strong></p>
+                <div id="nomeados-list">
+                    <ul id="nomeados-items"></ul>
+                </div>
+            
+                <p>Best regards,<br />The Diário Oficial Team</p>
+            </div>
+
+            
+            <!-- Email Input Form -->
+            <form id="email-subscription-form">
+                <label for="email"><strong>Receber essa informação por email:</strong></label>
                 <input type="email" id="email" name="email" placeholder="you@example.com" required />
-                <button type="submit">Subscribe</button>
+                <button type="submit" class="email-submit-button">Enviar</button>
             </form>
         </div>
     </div>
