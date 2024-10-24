@@ -114,7 +114,6 @@ function clearContainers() {
     nomeadosContainer.innerHTML = '';
 }
 
-// Render cards for each person (exoneração/nomeação)
 function renderCards(peopleList, container, actionType) {
     peopleList.forEach((person, index) => {
         const card = createCard(person, actionType);
@@ -128,20 +127,22 @@ function createCard(person, actionType) {
     const card = document.createElement('div');
     card.classList.add('card', actionType === 'exoneração' ? 'exonerado' : 'nomeado');
 
+    // Construct the card using the structured data (nome, categoria, subcategoria, data)
     card.innerHTML = `
         <div class="card-header">
             <span class="person-icon">👤</span>
-            <div class="card-name">${person}</div>
+            <div class="card-name">${person.nome}</div>
         </div>
         <div class="card-category">${person.categoria || 'Categoria não disponível'}</div>
         <div class="card-subcategory">${person.subcategoria || 'Subcategoria não disponível'}</div>
         <div class="card-date">${person.data || 'Sem data'}</div>
     `;
 
+    // Show card information on hover
     card.addEventListener('mouseenter', () => showCardInfo(person));
     card.addEventListener('mouseleave', hideCardInfo);
 
-    // Add click event to open the link in a new tab
+    // Add click event to open a link (can be customized for a specific URL)
     card.addEventListener('click', function () {
         window.open("https://www.doe.sp.gov.br/executivo/universidade-de-sao-paulo/despachos-do-reitor-de-18-de-outubro-de-2024-20241021123911227666932", '_blank');
     });
@@ -153,9 +154,9 @@ function showCardInfo(person) {
     cardInfoContainer.innerHTML = `
         <div class="json-content">
             <div class="json-brace">JSON-Formatted <br /><br />{</div><br />
-            <div class="json-pair"><span class="json-key">"Nome":</span> <span class="json-value">"${person}"</span>,</div>
-            <div class="json-pair"><span class="json-key">"Categoria":</span> <span class="json-value">"CATEGORIA"</span>,</div>
-            <div class="json-pair"><span class="json-key">"Subcategoria":</span> <span class="json-value">"SUB-CATEGORIA"</span>,</div>
+            <div class="json-pair"><span class="json-key">"Nome":</span> <span class="json-value">"${person.nome}"</span>,</div>
+            <div class="json-pair"><span class="json-key">"Categoria":</span> <span class="json-value">"${person.categoria}"</span>,</div>
+            <div class="json-pair"><span class="json-key">"Subcategoria":</span> <span class="json-value">"${person.subcategoria}"</span>,</div>
             <div class="json-pair"><span class="json-key">"Data":</span> <span class="json-value">"${person.data || 'Sem data'}"</span></div>
             <div class="json-brace">}</div>
         </div>
@@ -186,15 +187,17 @@ function populateEmailPreview(data) {
     exoneradosList.innerHTML = '';
     nomeadosList.innerHTML = '';
 
+    // Populate Exonerados list
     data.exoneração.forEach(person => {
         const listItem = document.createElement('li');
-        listItem.textContent = person;
+        listItem.textContent = `${person.nome} - ${person.categoria}, ${person.subcategoria}, ${person.data || 'Sem data'}`;
         exoneradosList.appendChild(listItem);
     });
 
+    // Populate Nomeados list
     data.nomeação.forEach(person => {
         const listItem = document.createElement('li');
-        listItem.textContent = person;
+        listItem.textContent = `${person.nome} - ${person.categoria}, ${person.subcategoria}, ${person.data || 'Sem data'}`;
         nomeadosList.appendChild(listItem);
     });
 }

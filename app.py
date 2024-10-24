@@ -2,13 +2,59 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify
 from werkzeug.utils import secure_filename
 import os
 import json
-import requests  # Import requests to make HTTP requests
+import requests
+import random
+from datetime import datetime, timedelta
+
+# Sample fake data for categories and subcategories
+CATEGORIES = [
+    "Secretaria de Meio Ambiente",
+    "Casa Civil",
+    "Secretaria de Administração",
+    "Secretaria de Educação",
+    "Secretaria de Esportes",
+    "Secretaria de Saúde",
+    "Secretaria de Cultura",
+    "Secretaria de Justiça",
+    "Secretaria de Transporte",
+]
+
+SUBCATEGORIES = [
+    "Coordenadoria Geral",
+    "Gabinete do Secretário",
+    "Administração Geral",
+    "Diretoria de Ensino",
+    "Coordenadoria de Esportes",
+    "Administração de Saúde",
+    "Coordenadoria Cultural",
+    "Procuradoria Geral",
+    "Coordenadoria de Transporte",
+]
+
 
 app = Flask(__name__)
 
 # Configurations for file upload
 app.config["UPLOAD_FOLDER"] = "./uploads"
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+
+
+# Generate a random date within the last year
+def generate_random_date():
+    today = datetime.now()
+    random_days = random.randint(1, 365)
+    random_date = today - timedelta(days=random_days)
+    return random_date.strftime("%Y-%m-%d")
+
+
+# Generate fake details for categoria and subcategoria
+def generate_fake_data(person_name):
+    return {
+        "nome": person_name,
+        "categoria": random.choice(CATEGORIES),
+        "subcategoria": random.choice(SUBCATEGORIES),
+        "data": generate_random_date(),
+    }
 
 
 # Allowed file extensions
@@ -91,8 +137,30 @@ def analyze():
 
             # Check the response from the external server
             if response.status_code == 200:
-                # Return the JSON response to the frontend
-                return jsonify(response.json())
+                # Transform the response JSON
+                original_data = response.json()
+
+                # Transform exoneration list
+                exonerados = [
+                    generate_fake_data(person)
+                    for person in original_data.get("exoneração", [])
+                ]
+
+                # Transform nomination list
+                nomeados = [
+                    generate_fake_data(person)
+                    for person in original_data.get("nomeação", [])
+                ]
+
+                # Construct the final transformed response
+                transformed_data = {
+                    "exoneração": exonerados,
+                    "nomeação": nomeados,
+                }
+
+                # Return the transformed JSON response to the frontend
+                return jsonify(transformed_data)
+
             else:
                 return (
                     jsonify(
@@ -109,3 +177,4 @@ def analyze():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
