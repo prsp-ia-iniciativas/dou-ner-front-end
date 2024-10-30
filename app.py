@@ -2,13 +2,84 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify
 from werkzeug.utils import secure_filename
 import os
 import json
-import requests  # Import requests to make HTTP requests
+import requests
+import random
+import torch
+from datetime import datetime, timedelta
+from transformers import AutoModelForTokenClassification, AutoTokenizer
+from transformers import pipeline
 
 app = Flask(__name__)
 
 # Configurations for file upload
 app.config["UPLOAD_FOLDER"] = "./uploads"
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+
+# Sample fake data for categories and subcategories
+CATEGORIES = [
+    "Secretaria de Meio Ambiente",
+    "Casa Civil",
+    "Secretaria de Administração",
+    "Secretaria de Educação",
+    "Secretaria de Esportes",
+    "Secretaria de Saúde",
+    "Secretaria de Cultura",
+    "Secretaria de Justiça",
+    "Secretaria de Transporte",
+]
+
+SUBCATEGORIES = [
+    "Coordenadoria Geral",
+    "Gabinete do Secretário",
+    "Administração Geral",
+    "Diretoria de Ensino",
+    "Coordenadoria de Esportes",
+    "Administração de Saúde",
+    "Coordenadoria Cultural",
+    "Procuradoria Geral",
+    "Coordenadoria de Transporte",
+]
+
+# Load the pre-trained model and tokenizer
+model_name = "marquesafonso/bertimbau-large-ner-selective"
+model = AutoModelForTokenClassification.from_pretrained(model_name)
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+model_name = "pierreguillou/ner-bert-base-cased-pt-lenerbr"
+
+pipe = pipeline("ner", model=model_name)
+
+def get_ner_predictions(input_text):
+    # Use the pipeline to get NER predictions
+    results = pipe(input_text)
+    
+    # Prepare the list of entities
+    predicted_entities = []
+    for entity in results:
+        # Include entity word and label
+        predicted_entities.append(
+            (entity["word"], entity["entity"], entity["start"], entity["end"])
+        )
+
+    return predicted_entities
+
+
+# Generate a random date within the last year
+def generate_random_date():
+    today = datetime.now()
+    random_days = random.randint(1, 365)
+    random_date = today - timedelta(days=random_days)
+    return random_date.strftime("%Y-%m-%d")
+
+
+# Generate fake details for categoria and subcategoria
+def generate_fake_data(person_name):
+    return {
+        "nome": person_name,
+        "categoria": random.choice(CATEGORIES),
+        "subcategoria": random.choice(SUBCATEGORIES),
+        "data": generate_random_date(),
+    }
 
 
 # Allowed file extensions
@@ -21,6 +92,9 @@ def allowed_file(filename):
 def index():
     return render_template("index.html")
 
+@app.route("/ner")
+def ner():
+    return render_template("ner.html")
 
 # Route to handle file upload
 @app.route("/upload", methods=["POST"])
@@ -91,8 +165,30 @@ def analyze():
 
             # Check the response from the external server
             if response.status_code == 200:
-                # Return the JSON response to the frontend
-                return jsonify(response.json())
+                # Transform the response JSON
+                original_data = response.json()
+
+                # Transform exoneration list
+                exonerados = [
+                    generate_fake_data(person)
+                    for person in original_data.get("exoneração", [])
+                ]
+
+                # Transform nomination list
+                nomeados = [
+                    generate_fake_data(person)
+                    for person in original_data.get("nomeação", [])
+                ]
+
+                # Construct the final transformed response
+                transformed_data = {
+                    "exoneração": exonerados,
+                    "nomeação": nomeados,
+                }
+
+                # Return the transformed JSON response to the frontend
+                return jsonify(transformed_data)
+
             else:
                 return (
                     jsonify(
@@ -105,6 +201,30 @@ def analyze():
             return jsonify({"error": str(e)}), 500
 
     return jsonify({"error": "Invalid file type"}), 400
+
+
+@app.route("/ner-inference", methods=["POST"])
+def ner_inference():
+    try:
+        # Extract the input text from the request
+        data = request.json
+        text = data.get("text", "")
+        print(text)
+
+        # Ensure text is provided
+        if not text.strip():
+            return jsonify({"error": "No text provided"}), 400
+
+        # Get NER predictions using the get_ner_predictions function
+        entities = get_ner_predictions(text)
+        print(entities)
+
+        # Return the entities found in the text
+        return jsonify({"entities": entities})
+
+    except Exception as e:
+        # Log the error and return a 500 response
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == "__main__":
